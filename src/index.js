@@ -1,24 +1,25 @@
-import { fetchImages } from './fetchImages';
-// import { renderImages } from './renderImages';
+import NewsImages from './fetchImages';
 import Notiflix from 'notiflix';
 import './common.css';
 
 const formEl = document.querySelector('#search-form');
 const galleryEl = document.querySelector('.gallery');
+const loadMoreEl = document.querySelector('.load-more');
 
-formEl.addEventListener('input', onInputData);
+const newImages = new NewsImages();
+
 formEl.addEventListener('submit', onFormSubmit);
-
-let searchQuery = '';
-
-function onInputData(event) {
-  searchQuery = event.target.value.trim();
-}
+loadMoreEl.addEventListener('click', onLoadMore);
 
 function onFormSubmit(event) {
   event.preventDefault();
-  fetchImages(searchQuery).then(res => {
-    if (res.data.totalHits === 0) {
+
+  newImages.query = event.currentTarget.elements.searchQuery.value.trim();
+  console.log(newImages.query);
+
+  newImages.fetchImages().then(res => {
+    console.log(res);
+    if (res.totalHits === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
@@ -26,12 +27,12 @@ function onFormSubmit(event) {
     }
 
     renderImages(res);
-    Notiflix.Notify.success(`Hooray! We found ${res.data.totalHits} images.`);
+    Notiflix.Notify.success(`Hooray! We found ${res.totalHits} images.`);
   });
 }
 
 function renderImages(searchQuery) {
-  const markup = searchQuery.data.hits
+  const markup = searchQuery.hits
     .map(
       ({
         webformatURL,
@@ -63,4 +64,8 @@ function renderImages(searchQuery) {
     )
     .join('');
   galleryEl.insertAdjacentHTML('beforeend', markup);
+}
+
+function onLoadMore() {
+  newImages.fetchImages().then(renderImages);
 }
