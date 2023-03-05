@@ -39,3 +39,7 @@ img {
   font-size: 14px;
   text-align: center;
 }
+
+.is-hidden {
+  display: none;
+}

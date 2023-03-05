@@ -21,10 +21,13 @@ export default class NewsImages {
       this.page
     }&${searchParams.toString()}`;
 
-    return axios.get(url).then(({ data }) => {
-      this.incrementPage();
-      return data;
-    });
+    return axios
+      .get(url)
+      .then(({ data }) => {
+        this.incrementPage();
+        return data;
+      })
+      .catch(error => console.log(error));
   }
 
   incrementPage() {
@@ -33,6 +36,10 @@ export default class NewsImages {
 
   resetPage() {
     this.page = 1;
+  }
+
+  get pages() {
+    return this.page;
   }
 
   get query() {
