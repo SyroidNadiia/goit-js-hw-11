@@ -3,10 +3,12 @@ import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import './common.css';
+import HiddenButton from './load-more-btn';
 
 const formEl = document.querySelector('#search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreEl = document.querySelector('.load-more');
+const btnLoadMore = new HiddenButton('.load-more');
 
 const lightbox = new SimpleLightbox('.gallery a', {});
 
@@ -14,7 +16,7 @@ const newImages = new NewsImages();
 
 formEl.addEventListener('submit', onFormSubmit);
 loadMoreEl.addEventListener('click', onLoadMore);
-onHideBtn();
+// onHideBtn();
 
 function onFormSubmit(event) {
   event.preventDefault();
@@ -31,8 +33,9 @@ function onFormSubmit(event) {
       );
       return;
     }
-    onCheckingNumberImages(res);
+
     renderImages(res);
+    btnLoadMore.show();
     Notiflix.Notify.success(`Hooray! We found ${res.totalHits} images.`);
     lightbox.refresh();
   });
@@ -72,12 +75,11 @@ function renderImages(searchQuery) {
     .join('');
 
   galleryEl.insertAdjacentHTML('beforeend', markup);
-  onShowBtn();
+  // onShowBtn();
 }
 
 function onLoadMore() {
   newImages.fetchImages().then(res => {
-    onCheckingNumberImages(res);
     renderImages(res);
 
     lightbox.refresh();
@@ -86,23 +88,4 @@ function onLoadMore() {
 
 function onCleanGallery() {
   galleryEl.innerHTML = '';
-}
-
-function onHideBtn() {
-  loadMoreEl.classList.remove('is-show');
-}
-
-function onShowBtn() {
-  loadMoreEl.classList.add('is-show');
-}
-
-function onCheckingNumberImages(res) {
-  if (newImages.totalimages >= res.totalHits) {
-    onHideBtn();
-    Notiflix.Notify.info(
-      "We're sorry, but you've reached the end of search results."
-    );
-
-    return;
-  }
 }

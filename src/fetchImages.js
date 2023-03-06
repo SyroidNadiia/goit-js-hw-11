@@ -1,4 +1,6 @@
 import axios from 'axios';
+import HiddenButton from './load-more-btn';
+import Notiflix from 'notiflix';
 
 const BASE_URL = 'https://pixabay.com/api/';
 const API_KEY = '34120015-2fabafcb6d32a905917c5fb2c';
@@ -10,11 +12,13 @@ const searchParams = new URLSearchParams({
   per_page: '40',
 });
 
+const btnLoadMore = new HiddenButton('.load-more');
+
 export default class NewsImages {
   constructor() {
     this.searchQuery = '';
     this.page = 1;
-    this.totalimages = 0;
+    this.totalImages = 0;
   }
 
   fetchImages() {
@@ -25,10 +29,20 @@ export default class NewsImages {
     return axios
       .get(url)
       .then(({ data }) => {
-        this.totalimages += data.hits.length;
-       
+        this.totalImages += data.hits.length;
+        console.log(this.totalImages);
+        console.log(data.totalHits);
+        if (this.totalImages >= data.totalHits) {
+          btnLoadMore.hide();
+          Notiflix.Notify.info(
+            "We're sorry, but you've reached the end of search results."
+          );
+          return;
+        }
+
         return data;
       })
+
       .catch(error => console.log(error))
       .finally(() => this.incrementPage());
   }
@@ -39,10 +53,6 @@ export default class NewsImages {
 
   resetPage() {
     this.page = 1;
-  }
-
-  get pages() {
-    return this.page;
   }
 
   get query() {
