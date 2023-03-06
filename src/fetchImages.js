@@ -14,6 +14,7 @@ export default class NewsImages {
   constructor() {
     this.searchQuery = '';
     this.page = 1;
+    this.totalimages = 0;
   }
 
   fetchImages() {
@@ -24,17 +25,8 @@ export default class NewsImages {
     return axios
       .get(url)
       .then(({ data }) => {
-        if (
-          data &&
-          data.hits.length &&
-          data.hits.length * this.page >= data.totalHits
-        ) {
-          Notiflix.Notify.info(
-            "We're sorry, but you've reached the end of search results."
-          );
-          return;
-        }
-
+        this.totalimages += data.hits.length;
+       
         return data;
       })
       .catch(error => console.log(error))

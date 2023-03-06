@@ -31,7 +31,7 @@ function onFormSubmit(event) {
       );
       return;
     }
-
+    onCheckingNumberImages(res);
     renderImages(res);
     Notiflix.Notify.success(`Hooray! We found ${res.totalHits} images.`);
     lightbox.refresh();
@@ -77,7 +77,7 @@ function renderImages(searchQuery) {
 
 function onLoadMore() {
   newImages.fetchImages().then(res => {
-
+    onCheckingNumberImages(res);
     renderImages(res);
 
     lightbox.refresh();
@@ -96,13 +96,13 @@ function onShowBtn() {
   loadMoreEl.classList.add('is-show');
 }
 
-// function onCheckingNumberImages(res) {
-//   console.log(newImages.pages);
-//   if (res.hits.length * newImages.pages >= res.totalHits) {
-//     Notiflix.Notify.info(
-//       "We're sorry, but you've reached the end of search results."
-//     );
-//     onHideBtn();
-//     return;
-//   }
-// }
+function onCheckingNumberImages(res) {
+  if (newImages.totalimages >= res.totalHits) {
+    onHideBtn();
+    Notiflix.Notify.info(
+      "We're sorry, but you've reached the end of search results."
+    );
+
+    return;
+  }
+}

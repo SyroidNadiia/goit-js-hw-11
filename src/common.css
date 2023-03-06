@@ -42,8 +42,6 @@ img {
 
 .load-more {
   display: none;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .photo-item {
@@ -52,6 +50,8 @@ img {
 }
 
 .is-show {
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 15px;
   display: block;
   padding: 5px 10px;
