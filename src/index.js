@@ -1,10 +1,14 @@
 import NewsImages from './fetchImages';
 import Notiflix from 'notiflix';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 import './common.css';
 
 const formEl = document.querySelector('#search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreEl = document.querySelector('.load-more');
+
+const lightbox = new SimpleLightbox('.gallery a', {});
 
 const newImages = new NewsImages();
 
@@ -14,7 +18,6 @@ onHideBtn();
 
 function onFormSubmit(event) {
   event.preventDefault();
-  onHideBtn();
 
   newImages.query = event.currentTarget.elements.searchQuery.value.trim();
 
@@ -28,10 +31,10 @@ function onFormSubmit(event) {
       );
       return;
     }
-    onCheckingNumberImages(res);
 
     renderImages(res);
     Notiflix.Notify.success(`Hooray! We found ${res.totalHits} images.`);
+    lightbox.refresh();
   });
 }
 
@@ -47,7 +50,7 @@ function renderImages(searchQuery) {
         comments,
         downloads,
       }) => {
-        return `<div class="photo-card">
+        return `<a class="photo-item" href = "${largeImageURL}"><div class="photo-card">
   <img src="${webformatURL}" alt="${tags}" loading="lazy" />
   <div class="info">
     <p class="info-item">
@@ -63,18 +66,21 @@ function renderImages(searchQuery) {
       <b>Downloads</b> ${downloads}
     </p>
   </div>
-</div>`;
+</div></a>`;
       }
     )
     .join('');
+
   galleryEl.insertAdjacentHTML('beforeend', markup);
   onShowBtn();
 }
 
 function onLoadMore() {
   newImages.fetchImages().then(res => {
+
     renderImages(res);
-    onCheckingNumberImages(res);
+
+    lightbox.refresh();
   });
 }
 
@@ -82,19 +88,21 @@ function onCleanGallery() {
   galleryEl.innerHTML = '';
 }
 
-function onShowBtn() {
-  loadMoreEl.classList.remove('is-hidden');
-}
-
 function onHideBtn() {
-  loadMoreEl.classList.add('is-hidden');
+  loadMoreEl.classList.remove('is-show');
 }
 
-function onCheckingNumberImages(res) {
-  if (res.hits.length * newImages.pages >= res.totalHits) {
-    Notiflix.Notify.info(
-      "We're sorry, but you've reached the end of search results."
-    );
-    onHideBtn();
-  }
+function onShowBtn() {
+  loadMoreEl.classList.add('is-show');
 }
+
+// function onCheckingNumberImages(res) {
+//   console.log(newImages.pages);
+//   if (res.hits.length * newImages.pages >= res.totalHits) {
+//     Notiflix.Notify.info(
+//       "We're sorry, but you've reached the end of search results."
+//     );
+//     onHideBtn();
+//     return;
+//   }
+// }

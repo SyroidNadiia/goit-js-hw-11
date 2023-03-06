@@ -24,10 +24,21 @@ export default class NewsImages {
     return axios
       .get(url)
       .then(({ data }) => {
-        this.incrementPage();
+        if (
+          data &&
+          data.hits.length &&
+          data.hits.length * this.page >= data.totalHits
+        ) {
+          Notiflix.Notify.info(
+            "We're sorry, but you've reached the end of search results."
+          );
+          return;
+        }
+
         return data;
       })
-      .catch(error => console.log(error));
+      .catch(error => console.log(error))
+      .finally(() => this.incrementPage());
   }
 
   incrementPage() {
