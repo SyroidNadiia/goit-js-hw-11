@@ -16,19 +16,19 @@ export default class NewsImages {
     this.page = 1;
   }
 
-  fetchImages() {
-    const url = `${BASE_URL}?key=${API_KEY}&q=${this.searchQuery}&page=${
-      this.page
-    }&${searchParams.toString()}`;
 
-    return axios
-      .get(url)
-      .then(({ data }) => {
-        return data;
-      })
-      .catch(error => console.log(error));
+  async fetchImages() {
+    const url = `${BASE_URL}?key=${API_KEY}&q=${this.searchQuery}&page=${this.page
+      }&${searchParams.toString()}`;
+
+    try {
+      const { data } = await axios.get(url);
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
   }
-
+  
   incrementPage() {
     this.page += 1;
   }

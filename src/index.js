@@ -16,7 +16,7 @@ const newImages = new NewsImages();
 formEl.addEventListener('submit', onFormSubmit);
 loadMoreEl.addEventListener('click', onLoadMore);
 
-function onFormSubmit(event) {
+async function onFormSubmit(event) {
   event.preventDefault();
 
   newImages.query = event.currentTarget.elements.searchQuery.value.trim();
@@ -29,7 +29,8 @@ function onFormSubmit(event) {
   onCleanGallery();
   btnLoadMore.hide();
 
-  newImages.fetchImages().then(res => {
+  try {
+    const res = await newImages.fetchImages();
     if (res.totalHits === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
@@ -38,13 +39,15 @@ function onFormSubmit(event) {
     }
 
     renderImages(res);
-
     btnLoadMore.show();
     Notiflix.Notify.success(`Hooray! We found ${res.totalHits} images.`);
     lightbox.refresh();
     onCheckLastPage(res);
     newImages.incrementPage();
-  });
+  } catch (error) {
+    console.log(error);
+    Notiflix.Notify.failure('Something went wrong. Please try again.');
+  }
 }
 
 function renderImages(searchQuery) {
