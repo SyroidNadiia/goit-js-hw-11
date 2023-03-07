@@ -1,9 +1,12 @@
-import NewsImages from './fetchImages';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import './common.css';
+
+import NewsImages from './fetchImages';
 import HiddenButton from './load-more-btn';
+
+import './common.css';
+
 
 const formEl = document.querySelector('#search-form');
 const galleryEl = document.querySelector('.gallery');
@@ -97,13 +100,12 @@ function renderImages(searchQuery) {
   }
 }
 
-function onLoadMore() {
-  newImages.fetchImages().then(res => {
-    renderImages(res);
-    onCheckLastPage(res);
-    newImages.incrementPage();
-    lightbox.refresh();
-  });
+async function onLoadMore() {
+  const res = await newImages.fetchImages();
+  renderImages(res);
+  onCheckLastPage(res);
+  newImages.incrementPage();
+  lightbox.refresh();
 }
 
 function onCleanGallery() {
