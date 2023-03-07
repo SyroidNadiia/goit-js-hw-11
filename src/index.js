@@ -42,7 +42,7 @@ function onFormSubmit(event) {
     btnLoadMore.show();
     Notiflix.Notify.success(`Hooray! We found ${res.totalHits} images.`);
     lightbox.refresh();
-    onCheckLastPage();
+    onCheckLastPage(res);
     newImages.incrementPage();
   });
 }
@@ -81,20 +81,23 @@ function renderImages(searchQuery) {
     .join('');
 
   galleryEl.insertAdjacentHTML('beforeend', markup);
-  const { height: cardHeight } = document
-    .querySelector('.gallery')
-    .firstElementChild.getBoundingClientRect();
 
-  window.scrollBy({
-    top: cardHeight * 2,
-    behavior: 'smooth',
-  });
+  if (newImages.page > 1) {
+    const { height: cardHeight } = document
+      .querySelector('.gallery')
+      .firstElementChild.getBoundingClientRect();
+
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
+  }
 }
 
 function onLoadMore() {
   newImages.fetchImages().then(res => {
     renderImages(res);
-    onCheckLastPage();
+    onCheckLastPage(res);
     newImages.incrementPage();
     lightbox.refresh();
   });
@@ -104,7 +107,7 @@ function onCleanGallery() {
   galleryEl.innerHTML = '';
 }
 
-function onCheckLastPage() {
+function onCheckLastPage(res) {
   if (newImages.page === Math.ceil(res.totalHits / 40)) {
     btnLoadMore.hide();
     Notiflix.Notify.info(
