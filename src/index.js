@@ -8,23 +8,26 @@ import HiddenButton from './load-more-btn';
 const formEl = document.querySelector('#search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreEl = document.querySelector('.load-more');
+
 const btnLoadMore = new HiddenButton('.load-more');
-
 const lightbox = new SimpleLightbox('.gallery a', {});
-
 const newImages = new NewsImages();
 
 formEl.addEventListener('submit', onFormSubmit);
 loadMoreEl.addEventListener('click', onLoadMore);
-// onHideBtn();
 
 function onFormSubmit(event) {
   event.preventDefault();
 
   newImages.query = event.currentTarget.elements.searchQuery.value.trim();
 
+  if (newImages.query === '') {
+    return;
+  }
+
   newImages.resetPage();
   onCleanGallery();
+  btnLoadMore.hide();
 
   newImages.fetchImages().then(res => {
     if (res.totalHits === 0) {
@@ -35,9 +38,12 @@ function onFormSubmit(event) {
     }
 
     renderImages(res);
+
     btnLoadMore.show();
     Notiflix.Notify.success(`Hooray! We found ${res.totalHits} images.`);
     lightbox.refresh();
+    onCheckLastPage();
+    newImages.incrementPage();
   });
 }
 
@@ -75,17 +81,35 @@ function renderImages(searchQuery) {
     .join('');
 
   galleryEl.insertAdjacentHTML('beforeend', markup);
-  // onShowBtn();
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
 }
 
 function onLoadMore() {
   newImages.fetchImages().then(res => {
     renderImages(res);
-
+    onCheckLastPage();
+    newImages.incrementPage();
     lightbox.refresh();
   });
 }
 
 function onCleanGallery() {
   galleryEl.innerHTML = '';
+}
+
+function onCheckLastPage() {
+  if (newImages.page === Math.ceil(res.totalHits / 40)) {
+    btnLoadMore.hide();
+    Notiflix.Notify.info(
+      "We're sorry, but you've reached the end of search results."
+    );
+    return;
+  }
 }
